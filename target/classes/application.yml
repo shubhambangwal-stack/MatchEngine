@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: match-engine
+    
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb+srv://shsharma0802_db_user:doiv@cluster0.lxltpdi.mongodb.net/void?appName=Cluster}
+      auto-index-creation: ${SPRING_DATA_MONGODB_AUTO_INDEX_CREATION:false}
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./data/batchdb;DB_CLOSE_DELAY=-1;AUTO_SERVER=true}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    driver-class-name: org.h2.Driver
+
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:187.127.137.216:9092}
+    consumer:
+      group-id: match-engine-group-v2
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+    template:
+      default-topic: match.daily_batch_ready
+
+  batch:
+    job:
+      enabled: false # We will trigger it via scheduler or manually
+    jdbc:
+      initialize-schema: always
+
+server:
+  port: 8085
+
+logging:
+  level:
+    org.springframework.batch: DEBUG
+    com.pearl.astrology.match: DEBUG
+
+match:
+  scoring:
+    cron: "0 25 12 * * *" # Run at 11:25 AM daily
+    chunk-size: 50
+    core-pool-size: 4
+    max-pool-size: 8
+    queue-capacity: 100
+    throttle-limit: 4
+    max-candidates-per-user: ${MATCH_SCORING_MAX_CANDIDATES:2000}
+
