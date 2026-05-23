@@ -1,0 +1,5 @@
+# IDE files
+.idea/vcs.xml
+
+# Database files
+data/batchdb.trace.db
